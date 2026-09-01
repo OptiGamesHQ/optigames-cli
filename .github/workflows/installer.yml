@@ -1,6 +1,6 @@
 name: Installer
 
-# bootstrap/optigames.ps1 is what `irm optigamesbeta.online/cli | iex` executes on other
+# bootstrap/optigames.ps1 is what `irm optigames.gg/cli | iex` executes on other
 # people's machines. It gets two checks that the rest of the repo does not need.
 on:
   push:
