@@ -1,0 +1,51 @@
+<Application x:Class="OptiGames.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:OptiGames"
+             xmlns:vm="clr-namespace:OptiGames.ViewModels"
+             xmlns:views="clr-namespace:OptiGames.Views"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Icons.xaml"/>
+                <ResourceDictionary Source="Theme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- The general converters live in Theme.xaml, because the control templates
+                 there need them and a merged dictionary cannot look forward into here. -->
+            <!-- Applied state is green, not red. Red is the brand, the interactive colour and
+                 the danger colour all at once, so using it for "this is on and fine" made a
+                 healthy system read as a page full of warnings. -->
+            <local:BoolToBrush x:Key="StatusBrush"
+                               True="{StaticResource B.Good}"
+                               False="{StaticResource B.TextMuted}"/>
+
+            <!-- "There is something here" is not a success state, so reclaimable sizes stay on
+                 the accent rather than borrowing the green. -->
+            <local:BoolToBrush x:Key="SizeBrush"
+                               True="{StaticResource B.Accent}"
+                               False="{StaticResource B.TextMuted}"/>
+
+            <!-- Page view models render through these, so navigation is just a property set. -->
+            <DataTemplate DataType="{x:Type vm:HomeViewModel}">
+                <views:HomeView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:OptimizeViewModel}">
+                <views:OptimizeView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:CleanDriveViewModel}">
+                <views:CleanDriveView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:RestorePointViewModel}">
+                <views:RestorePointView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:HelpViewModel}">
+                <views:HelpView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+                <views:SettingsView/>
+            </DataTemplate>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

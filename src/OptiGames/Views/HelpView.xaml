@@ -1,0 +1,159 @@
+<UserControl x:Class="OptiGames.Views.HelpView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <UserControl.Resources>
+
+        <!-- The icon sits in a FIXED 44px column, so the icon, the title and the blurb
+             start on the same vertical line in every card no matter how long the text
+             is. An Auto column sized itself per card and staggered the three icons. -->
+        <Style x:Key="S.HelpIcon" TargetType="Path" BasedOn="{StaticResource S.Icon}">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Accent}" Value="True">
+                    <Setter Property="Stroke" Value="{StaticResource B.Accent}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="S.HelpTitle" TargetType="TextBlock" BasedOn="{StaticResource T.CardTitle}">
+            <Setter Property="FontSize" Value="13.5"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Accent}" Value="True">
+                    <Setter Property="Foreground" Value="{StaticResource B.Accent}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- The card owns its own template so hover can reach the arrow. The arrow's
+             TranslateTransform is declared inline inside the template, which gives every
+             realised card its own instance; a transform in a Style setter would be shared
+             and animating it would move all four arrows at once. -->
+        <Style x:Key="S.HelpCard" TargetType="Button" BasedOn="{StaticResource S.Button}">
+            <Setter Property="Padding" Value="20,18"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{StaticResource B.Card}"
+                                BorderBrush="{StaticResource B.Border}"
+                                BorderThickness="1" CornerRadius="10"
+                                Padding="{TemplateBinding Padding}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="44"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Path Grid.Column="0" Style="{StaticResource S.HelpIcon}"
+                                      Data="{Binding Icon, Converter={StaticResource Icon}}"/>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Title}"
+                                               Style="{StaticResource S.HelpTitle}"/>
+                                    <TextBlock Text="{Binding Blurb}"
+                                               Style="{StaticResource T.Body}"
+                                               Margin="0,5,16,0"/>
+                                </StackPanel>
+
+                                <Path x:Name="Arrow" Grid.Column="2"
+                                      Style="{StaticResource S.Icon}"
+                                      Width="16" Height="16"
+                                      Data="{StaticResource I.External}"
+                                      Stroke="{StaticResource B.TextMuted}">
+                                    <Path.RenderTransform>
+                                        <TranslateTransform x:Name="ArrowShift" X="0"/>
+                                    </Path.RenderTransform>
+                                </Path>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource B.CardHover}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource B.AccentEdge}"/>
+                                <Setter TargetName="Arrow" Property="Stroke" Value="{StaticResource B.Text}"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ArrowShift"
+                                                             Storyboard.TargetProperty="X"
+                                                             To="3" Duration="0:0:0.16">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ArrowShift"
+                                                             Storyboard.TargetProperty="X"
+                                                             To="0" Duration="0:0:0.16">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource B.Input}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28,0,20,24">
+        <StackPanel x:Name="PageRoot" MaxWidth="700" HorizontalAlignment="Left" Opacity="0">
+            <StackPanel.RenderTransform>
+                <TranslateTransform x:Name="PageLift" Y="16"/>
+            </StackPanel.RenderTransform>
+            <StackPanel.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                             From="0" To="1" Duration="0:0:0.26">
+                                <DoubleAnimation.EasingFunction>
+                                    <CubicEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetName="PageLift"
+                                             Storyboard.TargetProperty="Y"
+                                             From="16" To="0" Duration="0:0:0.26">
+                                <DoubleAnimation.EasingFunction>
+                                    <CubicEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </StackPanel.Triggers>
+
+            <TextBlock Text="Need assistance? Our team is here to help."
+                       Style="{StaticResource T.CardTitle}" FontSize="15" Margin="0,4,0,14"/>
+
+            <ItemsControl ItemsSource="{Binding Links}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Style="{StaticResource S.HelpCard}"
+                                Margin="0,0,0,10"
+                                HorizontalContentAlignment="Stretch"
+                                Command="{Binding DataContext.OpenCommand,
+                                          RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                CommandParameter="{Binding Url}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

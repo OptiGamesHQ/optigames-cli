@@ -1,0 +1,79 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Icon grid contract
+
+         Every icon is drawn on a 24x24 grid, centred on (12,12), and authored so its
+         LONGEST side measures exactly 20 units.
+
+         That rule is what makes the set line up. These are rendered with Stretch="Uniform"
+         into a square box, and Uniform scales by min(box/width, box/height) — so if one icon's
+         ink is 18 wide and another's is 15, they get different scale factors, different stroke
+         weights, and different optical left edges. Pinning the longest side to 20 forces the
+         same divisor for every icon, and Uniform then centres each one identically.
+
+         Consequence: an icon that is naturally narrow (the bolt) stays narrow. That is correct
+         — it should look narrow, it just must not be scaled up to compensate.
+
+         Call sites must use a SQUARE box (Width == Height) or the rule does not hold.
+
+         The two caption glyphs at the bottom are deliberately outside this set: they live
+         alone in the title bar and are sized to the Windows convention, not to this grid.
+    -->
+
+    <!-- Navigation -->
+
+    <Geometry x:Key="I.Home">M 12 2 L 22 10.4 L 22 21 A 1 1 0 0 1 21 22 L 15.4 22 L 15.4 15.2 L 8.6 15.2 L 8.6 22 L 3 22 A 1 1 0 0 1 2 21 L 2 10.4 Z</Geometry>
+
+    <Geometry x:Key="I.Bolt">M 14.5 2 L 5 13.8 L 10.8 13.8 L 9.5 22 L 19 10.2 L 13.2 10.2 Z</Geometry>
+
+    <Geometry x:Key="I.Disk">M 2 6.5 A 2 2 0 0 1 4 4.5 L 20 4.5 A 2 2 0 0 1 22 6.5 L 22 17.5 A 2 2 0 0 1 20 19.5 L 4 19.5 A 2 2 0 0 1 2 17.5 Z M 2 12 L 22 12 M 5.8 15.8 L 5.81 15.8 M 9.2 15.8 L 9.21 15.8</Geometry>
+
+    <Geometry x:Key="I.Shield">M 12 2 L 20.5 5.4 L 20.5 12.2 C 20.5 17.4 16.8 21 12 22 C 7.2 21 3.5 17.4 3.5 12.2 L 3.5 5.4 Z M 15.2 9.4 A 3.8 3.8 0 1 0 15.9 12.8 M 15.2 9.4 L 15.2 6.7 M 15.2 9.4 L 12.5 9.4</Geometry>
+
+    <Geometry x:Key="I.Help">M 2 13.5 L 2 12 A 10 10 0 0 1 22 12 L 22 13.5 M 2 13 L 2 18.5 A 2 2 0 0 0 4 20.5 L 5.2 20.5 L 5.2 13 Z M 22 13 L 22 18.5 A 2 2 0 0 1 20 20.5 L 18.8 20.5 L 18.8 13 Z</Geometry>
+
+    <Geometry x:Key="I.Settings">M 2 6 L 22 6 M 2 12 L 22 12 M 2 18 L 22 18 M 8 6 A 2.2 2.2 0 1 0 8.01 6 M 15.5 12 A 2.2 2.2 0 1 0 15.51 12 M 6.5 18 A 2.2 2.2 0 1 0 6.51 18</Geometry>
+
+    <!-- Hardware -->
+
+    <Geometry x:Key="I.Chip">M 8 8 L 16 8 L 16 16 L 8 16 Z M 5 5 L 19 5 L 19 19 L 5 19 Z M 8.5 5 L 8.5 2 M 12 5 L 12 2 M 15.5 5 L 15.5 2 M 8.5 22 L 8.5 19 M 12 22 L 12 19 M 15.5 22 L 15.5 19 M 5 8.5 L 2 8.5 M 5 12 L 2 12 M 5 15.5 L 2 15.5 M 22 8.5 L 19 8.5 M 22 12 L 19 12 M 22 15.5 L 19 15.5</Geometry>
+
+    <Geometry x:Key="I.Gpu">M 2 6.5 L 22 6.5 L 22 16 L 6 16 L 6 20 L 2 20 Z M 12.5 11.2 A 3 3 0 1 0 12.51 11.2 M 18.5 9.5 L 18.51 9.5</Geometry>
+
+    <Geometry x:Key="I.Ram">M 2 7 L 22 7 L 22 15.5 L 2 15.5 Z M 5 15.5 L 5 18.5 M 9 15.5 L 9 18.5 M 15 15.5 L 15 18.5 M 19 15.5 L 19 18.5 M 7 10 L 7 12.5 M 10 10 L 10 12.5 M 13 10 L 13 12.5 M 16 10 L 16 12.5</Geometry>
+
+    <Geometry x:Key="I.Board">M 2 2 L 22 2 L 22 22 L 2 22 Z M 7 8 L 13 8 L 13 14 L 7 14 Z M 16 7.5 L 18.5 7.5 M 16 11 L 18.5 11 M 16 14.5 L 18.5 14.5 M 7 17.5 L 17 17.5</Geometry>
+
+    <Geometry x:Key="I.Windows">M 2 5.4 L 11.2 4 L 11.2 11.4 L 2 11.4 Z M 12.8 3.8 L 22 2.4 L 22 11.4 L 12.8 11.4 Z M 2 12.6 L 11.2 12.6 L 11.2 20 L 2 18.6 Z M 12.8 12.6 L 22 12.6 L 22 21.6 L 12.8 20.2 Z</Geometry>
+
+    <!-- Status and actions -->
+
+    <Geometry x:Key="I.Check">M 2 12.5 L 9 19.6 L 22 5.4</Geometry>
+
+    <Geometry x:Key="I.Warning">M 12 2 L 22 20.6 L 2 20.6 Z M 12 9 L 12 14.6 M 12 17.6 L 12.01 17.6</Geometry>
+
+    <Geometry x:Key="I.Plus">M 12 2 L 12 22 M 2 12 L 22 12</Geometry>
+
+    <Geometry x:Key="I.Trash">M 2 6.8 L 22 6.8 M 8.6 6.8 L 8.6 3 L 15.4 3 L 15.4 6.8 M 4.8 6.8 L 6 22 L 18 22 L 19.2 6.8 M 9.8 11 L 9.8 18 M 14.2 11 L 14.2 18</Geometry>
+
+    <Geometry x:Key="I.External">M 13.8 2 L 22 2 L 22 10.2 M 22 2 L 11.2 12.8 M 18.4 13.4 L 18.4 20.4 A 1.6 1.6 0 0 1 16.8 22 L 3.6 22 A 1.6 1.6 0 0 1 2 20.4 L 2 7.2 A 1.6 1.6 0 0 1 3.6 5.6 L 10.6 5.6</Geometry>
+
+    <!-- Help links -->
+
+    <Geometry x:Key="I.Mail">M 2 6 L 22 6 L 22 18 L 2 18 Z M 2 6.6 L 12 13.8 L 22 6.6</Geometry>
+
+    <Geometry x:Key="I.Bug">M 7.4 8.6 A 4.6 4.6 0 0 1 16.6 8.6 L 16.6 14.6 A 4.6 4.6 0 0 1 7.4 14.6 Z M 7.4 10.8 L 2 10.8 M 7.4 14.8 L 2.8 17.4 M 16.6 10.8 L 22 10.8 M 16.6 14.8 L 21.2 17.4 M 12 3 L 12 8 M 9 5.2 L 7.4 2.6 M 15 5.2 L 16.6 2.6</Geometry>
+
+    <Geometry x:Key="I.Globe">M 12 2 A 10 10 0 1 0 12.01 2 M 2 12 L 22 12 M 12 2 C 15.2 6 15.2 18 12 22 C 8.8 18 8.8 6 12 2</Geometry>
+
+    <!-- Discord's own mark is a solid blob; this is a stroked reading of it so it sits in the
+         same visual family as the rest of the set rather than looking pasted in. -->
+    <Geometry x:Key="I.Discord">M 8.8 6.4 A 13 13 0 0 1 15.2 6.4 M 8.8 6.4 C 4.8 7.2 2 10.2 2 14.8 C 2 17.6 3.4 19.8 5.6 21.2 L 7.5 18 M 15.2 6.4 C 19.2 7.2 22 10.2 22 14.8 C 22 17.6 20.6 19.8 18.4 21.2 L 16.5 18 M 7.5 18 A 11 11 0 0 0 16.5 18 M 9.4 13.4 A 1.5 1.8 0 1 0 9.41 13.4 M 14.6 13.4 A 1.5 1.8 0 1 0 14.61 13.4</Geometry>
+
+    <!-- Title bar (outside the 20-unit rule, see header) -->
+
+    <Geometry x:Key="I.Minimize">M 4 10 L 16 10</Geometry>
+    <Geometry x:Key="I.Close">M 4 4 L 16 16 M 16 4 L 4 16</Geometry>
+
+</ResourceDictionary>

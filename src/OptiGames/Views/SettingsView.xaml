@@ -1,0 +1,116 @@
+<UserControl x:Class="OptiGames.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28,0,20,24">
+        <StackPanel x:Name="PageRoot" MaxWidth="700" HorizontalAlignment="Left" Opacity="0">
+            <StackPanel.RenderTransform>
+                <TranslateTransform x:Name="PageLift" Y="16"/>
+            </StackPanel.RenderTransform>
+            <StackPanel.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                             From="0" To="1" Duration="0:0:0.26">
+                                <DoubleAnimation.EasingFunction>
+                                    <CubicEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetName="PageLift"
+                                             Storyboard.TargetProperty="Y"
+                                             From="16" To="0" Duration="0:0:0.26">
+                                <DoubleAnimation.EasingFunction>
+                                    <CubicEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </StackPanel.Triggers>
+
+            <!-- Section headers sit at left margin 0 so their left edge lines up with the
+                 card borders below them. -->
+            <TextBlock Text="Interface" Style="{StaticResource T.CardTitle}" FontSize="15"
+                       Margin="0,4,0,10"/>
+
+            <Border Style="{StaticResource S.Card}" Padding="20,4">
+                <StackPanel>
+                    <Grid Height="62">
+                        <StackPanel VerticalAlignment="Center" Margin="0,0,70,0">
+                            <TextBlock Text="Show advanced tweaks" Style="{StaticResource T.CardTitle}"/>
+                            <TextBlock Text="Reveals the higher-risk group on the Optimize page."
+                                       Style="{StaticResource T.Body}" Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <ToggleButton Style="{StaticResource S.Toggle}" HorizontalAlignment="Right"
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding ShowAdvanced, Mode=TwoWay}"/>
+                    </Grid>
+
+                    <Rectangle Height="1" Fill="{StaticResource B.Border}"/>
+
+                    <Grid Height="62">
+                        <StackPanel VerticalAlignment="Center" Margin="0,0,70,0">
+                            <TextBlock Text="Show page tips" Style="{StaticResource T.CardTitle}"/>
+                            <TextBlock Text="The one-time explainer shown the first time you open a page."
+                                       Style="{StaticResource T.Body}" Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <ToggleButton Style="{StaticResource S.Toggle}" HorizontalAlignment="Right"
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding ShowTips, Mode=TwoWay}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <TextBlock Text="Maintenance" Style="{StaticResource T.CardTitle}" FontSize="15"
+                       Margin="0,22,0,10"/>
+
+            <Border Style="{StaticResource S.Card}" Padding="20,4">
+                <StackPanel>
+                    <Grid Height="70">
+                        <StackPanel VerticalAlignment="Center" Margin="0,0,180,0">
+                            <TextBlock Text="Replay the welcome tour" Style="{StaticResource T.CardTitle}"/>
+                            <TextBlock Text="Runs the first-run walkthrough again from the start."
+                                       Style="{StaticResource T.Body}" Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <Button Content="Replay tour" Style="{StaticResource S.Button}"
+                                HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Command="{Binding ReplayOnboardingCommand}"/>
+                    </Grid>
+
+                    <Rectangle Height="1" Fill="{StaticResource B.Border}"/>
+
+                    <Grid Height="70">
+                        <StackPanel VerticalAlignment="Center" Margin="0,0,180,0">
+                            <TextBlock Text="Tool folder" Style="{StaticResource T.CardTitle}"/>
+                            <TextBlock Text="{Binding ToolFolder}" Style="{StaticResource T.Body}"
+                                       Margin="0,4,0,0" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                        <Button Content="Open folder" Style="{StaticResource S.Button}"
+                                HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Command="{Binding OpenToolFolderCommand}"/>
+                    </Grid>
+
+                    <Rectangle Height="1" Fill="{StaticResource B.Border}"/>
+
+                    <Grid Height="70">
+                        <StackPanel VerticalAlignment="Center" Margin="0,0,180,0">
+                            <TextBlock Text="Action log" Style="{StaticResource T.CardTitle}"/>
+                            <TextBlock Text="Every registry write and command this session has run."
+                                       Style="{StaticResource T.Body}" Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <Button Content="Clear log" Style="{StaticResource S.Button}"
+                                HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Command="{Binding ClearLogCommand}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <TextBlock Style="{StaticResource T.Body}" Margin="0,20,0,0" FontSize="11.5">
+                <Run Text="OptiGames"/>
+                <Run Text="{Binding Version, Mode=OneWay}"/>
+                <Run Text="· runs elevated · every change made here is reversible"/>
+            </TextBlock>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

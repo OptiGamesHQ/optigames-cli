@@ -1,0 +1,24 @@
+# Build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+publish/
+*.user
+*.suo
+
+# Rider / VS
+.vs/
+.idea/
+*.DotSettings.user
+
+# Never commit secrets or local state
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# OS noise
+Thumbs.db
+.DS_Store

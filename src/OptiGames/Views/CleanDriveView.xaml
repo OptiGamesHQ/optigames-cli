@@ -1,0 +1,241 @@
+<UserControl x:Class="OptiGames.Views.CleanDriveView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Page entrance: fade up over 260ms. -->
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="PageRoot"
+                                     Storyboard.TargetProperty="Opacity"
+                                     From="0" To="1" Duration="0:0:0.26">
+                        <DoubleAnimation.EasingFunction>
+                            <CubicEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                    <DoubleAnimation Storyboard.TargetName="PageRoot"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                     From="16" To="0" Duration="0:0:0.26">
+                        <DoubleAnimation.EasingFunction>
+                            <CubicEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </UserControl.Triggers>
+
+    <Grid x:Name="PageRoot" Opacity="0">
+        <Grid.RenderTransform>
+            <TranslateTransform Y="16"/>
+        </Grid.RenderTransform>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Padding="28,0,20,20">
+            <Grid Margin="0,0,8,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="380"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- ===== Left: hero + drives ===== -->
+                <StackPanel Grid.Column="0">
+                    <Border Style="{StaticResource S.Card}" Height="210" ClipToBounds="True">
+                        <!-- Rail and brackets so the drive render reads as a part seated on a
+                             board rather than a picture dropped into a box. -->
+                        <ContentControl Style="{StaticResource S.HeroFrame}">
+                            <!-- The render's own backdrop is a dark vignette, not the card
+                                 colour, so without a mask its rectangle edge is visible as a
+                                 lighter box. Feathering the outer third lets it sit on the
+                                 card instead of on top of it. -->
+                            <Image Source="/Assets/hero-clean.png" Stretch="Uniform"
+                                   RenderOptions.BitmapScalingMode="HighQuality">
+                                <Image.OpacityMask>
+                                    <RadialGradientBrush Center="0.5,0.5" GradientOrigin="0.5,0.5"
+                                                         RadiusX="0.62" RadiusY="0.7">
+                                        <GradientStop Color="#FF000000" Offset="0"/>
+                                        <GradientStop Color="#FF000000" Offset="0.6"/>
+                                        <GradientStop Color="#00000000" Offset="1"/>
+                                    </RadialGradientBrush>
+                                </Image.OpacityMask>
+                            </Image>
+                        </ContentControl>
+                    </Border>
+
+                    <TextBlock Text="Drives" Style="{StaticResource T.CardTitle}" FontSize="15"
+                               Margin="0,20,0,10"/>
+
+                    <ItemsControl ItemsSource="{Binding Drives}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource S.Card}" Margin="0,0,0,8" Padding="16,14">
+                                    <StackPanel>
+                                        <Grid>
+                                            <TextBlock Text="{Binding Header}"
+                                                       Style="{StaticResource T.CardTitle}"/>
+                                            <TextBlock Text="{Binding FreeText}" HorizontalAlignment="Right"
+                                                       FontSize="12" Foreground="{StaticResource B.TextDim}"/>
+                                        </Grid>
+
+                                        <!-- Usage meter. Width is computed against the track's own
+                                             ActualWidth so it stays correct as the window resizes. -->
+                                        <Border x:Name="Track" Height="6" CornerRadius="3"
+                                                Background="{StaticResource B.Input}" Margin="0,11,0,0">
+                                            <Border HorizontalAlignment="Left" CornerRadius="3"
+                                                    Background="{StaticResource B.AccentFill}">
+                                                <Border.Width>
+                                                    <MultiBinding Converter="{StaticResource Frac}">
+                                                        <Binding Path="UsedFraction"/>
+                                                        <Binding Path="ActualWidth" ElementName="Track"/>
+                                                    </MultiBinding>
+                                                </Border.Width>
+                                            </Border>
+                                        </Border>
+
+                                        <TextBlock Text="{Binding Sub}" FontSize="11.5" Margin="0,9,0,0"
+                                                   Foreground="{StaticResource B.TextMuted}"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <!-- ===== Right: what can be cleaned ===== -->
+                <StackPanel Grid.Column="2">
+                    <Grid Margin="0,2,0,12">
+                        <StackPanel>
+                            <TextBlock Text="Reclaimable" Style="{StaticResource T.CardTitle}" FontSize="15"/>
+                            <TextBlock Text="{Binding StatusLine}" Style="{StaticResource T.Body}"
+                                       Margin="0,4,0,0"/>
+                            <!-- Measurement rule under the size readout. -->
+                            <Border Height="12" Width="200" HorizontalAlignment="Left" Margin="0,5,0,0"
+                                    Background="{StaticResource B.TickScaleDim}"/>
+                        </StackPanel>
+                        <Button Content="Rescan" Style="{StaticResource S.ButtonGhost}"
+                                HorizontalAlignment="Right" VerticalAlignment="Top"
+                                Command="{Binding ScanCommand}"/>
+                    </Grid>
+
+                    <ItemsControl ItemsSource="{Binding Items}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="0,0,0,8" Padding="16,14">
+                                    <!-- Inline transform: one per row, so the hover lift moves
+                                         only the row under the cursor. -->
+                                    <Border.RenderTransform>
+                                        <TranslateTransform x:Name="RowLift" Y="0"/>
+                                    </Border.RenderTransform>
+
+                                    <Border.Style>
+                                        <Style TargetType="Border" BasedOn="{StaticResource S.HoverCard}">
+                                            <Style.Triggers>
+                                                <!-- A location holding nothing is still worth
+                                                     listing, so you can see it was checked, but
+                                                     it recedes rather than competing with the
+                                                     rows that actually have something to free. -->
+                                                <DataTrigger Binding="{Binding HasContent}" Value="False">
+                                                    <Setter Property="Opacity" Value="0.5"/>
+                                                </DataTrigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="BorderBrush"
+                                                            Value="{StaticResource B.AccentEdge}"/>
+                                                    <Trigger.EnterActions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation
+                                                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                                                    To="-2" Duration="0:0:0.13">
+                                                                    <DoubleAnimation.EasingFunction>
+                                                                        <CubicEase EasingMode="EaseOut"/>
+                                                                    </DoubleAnimation.EasingFunction>
+                                                                </DoubleAnimation>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </Trigger.EnterActions>
+                                                    <Trigger.ExitActions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation
+                                                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                                                    To="0" Duration="0:0:0.13">
+                                                                    <DoubleAnimation.EasingFunction>
+                                                                        <CubicEase EasingMode="EaseOut"/>
+                                                                    </DoubleAnimation.EasingFunction>
+                                                                </DoubleAnimation>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </Trigger.ExitActions>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <CheckBox Grid.Column="0" Style="{StaticResource S.Check}"
+                                                  VerticalAlignment="Top" Margin="0,2,14,0"
+                                                  IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
+
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="{Binding Name}"
+                                                       Style="{StaticResource T.CardTitle}"/>
+                                            <TextBlock Text="{Binding Description}"
+                                                       Style="{StaticResource T.Body}" Margin="0,5,12,0"/>
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Column="2" Text="{Binding SizeText}"
+                                                   FontSize="13" FontWeight="SemiBold"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{Binding HasContent,
+                                                                Converter={StaticResource SizeBrush}}"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+
+        <!-- ===== Clean bar ===== -->
+        <Border Grid.Row="1" Background="#FF0C0C0E" BorderBrush="{StaticResource B.Border}"
+                BorderThickness="0,1,0,0" Padding="28,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Style="{StaticResource T.CardTitle}" FontSize="13">
+                        <Run Text="{Binding SelectedText, Mode=OneWay}"/>
+                        <Run Text="selected"/>
+                    </TextBlock>
+                    <Border Height="12" Width="168" HorizontalAlignment="Left" Margin="0,4,0,0"
+                            Background="{StaticResource B.TickScaleDim}"
+                            Visibility="{Binding IsIdle, Converter={StaticResource Vis}}"/>
+                    <ProgressBar Style="{StaticResource S.Progress}" Width="320" Margin="0,8,0,0"
+                                 HorizontalAlignment="Left" Maximum="1"
+                                 Value="{Binding Progress, Mode=OneWay}"
+                                 Visibility="{Binding IsBusy, Converter={StaticResource Vis}}"/>
+                </StackPanel>
+
+                <Button Grid.Column="1" Content="{Binding CleanLabel}"
+                        Style="{StaticResource S.ButtonPrimary}"
+                        Command="{Binding CleanCommand}" MinWidth="170"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

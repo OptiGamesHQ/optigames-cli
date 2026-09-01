@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>OptiGames</RootNamespace>
+    <AssemblyName>OptiGames</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\optigames.ico</ApplicationIcon>
+    <AssemblyTitle>OptiGames</AssemblyTitle>
+    <Product>OptiGames</Product>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OptiGames.Core\OptiGames.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\hero-*.png" />
+    <Resource Include="Assets\logo.png" />
+    <Resource Include="Assets\brand-banner.png" />
+    <Resource Include="Assets\optigames.ico" />
+  </ItemGroup>
+
+</Project>

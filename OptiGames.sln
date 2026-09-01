@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{90DF3696-5A3E-4959-8BDA-AA7CDCAE423E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OptiGames.Core", "src\OptiGames.Core\OptiGames.Core.csproj", "{AB697A86-18D8-4639-B9CA-2136556E904C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OptiGames", "src\OptiGames\OptiGames.csproj", "{0A192E24-D128-4166-B2D6-BD595D8387FD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AB697A86-18D8-4639-B9CA-2136556E904C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB697A86-18D8-4639-B9CA-2136556E904C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB697A86-18D8-4639-B9CA-2136556E904C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB697A86-18D8-4639-B9CA-2136556E904C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A192E24-D128-4166-B2D6-BD595D8387FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A192E24-D128-4166-B2D6-BD595D8387FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A192E24-D128-4166-B2D6-BD595D8387FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A192E24-D128-4166-B2D6-BD595D8387FD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AB697A86-18D8-4639-B9CA-2136556E904C} = {90DF3696-5A3E-4959-8BDA-AA7CDCAE423E}
+		{0A192E24-D128-4166-B2D6-BD595D8387FD} = {90DF3696-5A3E-4959-8BDA-AA7CDCAE423E}
+	EndGlobalSection
+EndGlobal

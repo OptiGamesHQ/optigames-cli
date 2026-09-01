@@ -1,0 +1,394 @@
+<UserControl x:Class="OptiGames.Views.OnboardingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <UserControl.Resources>
+
+        <!-- Every step enters the same way: 24px lift plus a fade, on a cubic ease-out.
+             Reusing one storyboard keeps the whole flow feeling like one motion system. -->
+        <Storyboard x:Key="StepIn">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                             From="0" To="1" Duration="0:0:0.42">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(TranslateTransform.Y)"
+                             From="24" To="0" Duration="0:0:0.46">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <Style x:Key="S.Step" TargetType="Grid">
+            <Setter Property="Opacity" Value="0"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <TranslateTransform Y="24"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsVisible" Value="True">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource StepIn}"/>
+                    </Trigger.EnterActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid Background="{StaticResource B.Bg}">
+
+        <!-- The brand render sits behind the whole flow, heavily dimmed. It is only fully
+             legible on the welcome step, where the copy is short; the scrim below deepens
+             so later steps with dense text stay readable over it. -->
+        <Image Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality">
+            <Image.Source>
+                <BitmapImage UriSource="/Assets/brand-banner.png" DecodePixelWidth="1600"/>
+            </Image.Source>
+        </Image>
+
+        <Rectangle>
+            <Rectangle.Fill>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#C608080A" Offset="0"/>
+                    <GradientStop Color="#EB08080A" Offset="0.55"/>
+                    <GradientStop Color="#FF08080A" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <!-- Ambient red bloom behind everything -->
+        <Rectangle>
+            <Rectangle.Fill>
+                <RadialGradientBrush GradientOrigin="0.5,0.42" Center="0.5,0.42"
+                                     RadiusX="0.75" RadiusY="0.75">
+                    <GradientStop Color="#26FF0000" Offset="0"/>
+                    <GradientStop Color="#00FF0000" Offset="1"/>
+                </RadialGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <Grid Margin="0,44,0,40">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- ===================== Step counter ===================== -->
+            <TextBlock Grid.Row="0" HorizontalAlignment="Center" Style="{StaticResource T.Label}"
+                       Opacity="0.7">
+                <Run Text="STEP"/>
+                <Run Text="{Binding StepIndex, Mode=OneWay}"/>
+                <Run Text="OF"/>
+                <Run Text="{Binding StepCount, Mode=OneWay}"/>
+            </TextBlock>
+
+            <!-- ===================== Steps ===================== -->
+            <Grid Grid.Row="1">
+
+                <!-- 1. Welcome -->
+                <Grid Style="{StaticResource S.Step}" VerticalAlignment="Center"
+                      Visibility="{Binding IsWelcome, Converter={StaticResource Vis}}">
+                    <StackPanel HorizontalAlignment="Center">
+
+                        <!-- The mark drifts and its exhaust glow breathes, on separate loops
+                             so the two never sync into a single obvious pulse. -->
+                        <Grid Width="200" Height="180" HorizontalAlignment="Center">
+                            <Ellipse Width="230" Height="180" VerticalAlignment="Center">
+                                <Ellipse.Fill>
+                                    <RadialGradientBrush>
+                                        <GradientStop Color="#59FF0000" Offset="0"/>
+                                        <GradientStop Color="#00FF0000" Offset="1"/>
+                                    </RadialGradientBrush>
+                                </Ellipse.Fill>
+                                <Ellipse.RenderTransform>
+                                    <ScaleTransform x:Name="Bloom" CenterX="115" CenterY="90"/>
+                                </Ellipse.RenderTransform>
+                                <Ellipse.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                                <DoubleAnimation Storyboard.TargetName="Bloom"
+                                                                 Storyboard.TargetProperty="ScaleX"
+                                                                 From="0.85" To="1.15" Duration="0:0:1.9"/>
+                                                <DoubleAnimation Storyboard.TargetName="Bloom"
+                                                                 Storyboard.TargetProperty="ScaleY"
+                                                                 From="0.85" To="1.15" Duration="0:0:1.9"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Ellipse.Triggers>
+                            </Ellipse>
+
+                            <Image Source="/Assets/logo.png" Height="140" VerticalAlignment="Center"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                   RenderTransformOrigin="0.5,0.5">
+                                <Image.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform x:Name="MarkScale" ScaleX="0.86" ScaleY="0.86"/>
+                                        <TranslateTransform x:Name="MarkFloat"/>
+                                    </TransformGroup>
+                                </Image.RenderTransform>
+                                <Image.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="MarkScale"
+                                                                 Storyboard.TargetProperty="ScaleX"
+                                                                 From="0.86" To="1" Duration="0:0:0.7">
+                                                    <DoubleAnimation.EasingFunction>
+                                                        <BackEase EasingMode="EaseOut" Amplitude="0.5"/>
+                                                    </DoubleAnimation.EasingFunction>
+                                                </DoubleAnimation>
+                                                <DoubleAnimation Storyboard.TargetName="MarkScale"
+                                                                 Storyboard.TargetProperty="ScaleY"
+                                                                 From="0.86" To="1" Duration="0:0:0.7">
+                                                    <DoubleAnimation.EasingFunction>
+                                                        <BackEase EasingMode="EaseOut" Amplitude="0.5"/>
+                                                    </DoubleAnimation.EasingFunction>
+                                                </DoubleAnimation>
+                                                <DoubleAnimation Storyboard.TargetName="MarkFloat"
+                                                                 Storyboard.TargetProperty="Y"
+                                                                 From="-7" To="7" Duration="0:0:2.6"
+                                                                 BeginTime="0:0:0.7"
+                                                                 AutoReverse="True"
+                                                                 RepeatBehavior="Forever">
+                                                    <DoubleAnimation.EasingFunction>
+                                                        <SineEase EasingMode="EaseInOut"/>
+                                                    </DoubleAnimation.EasingFunction>
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Image.Triggers>
+                            </Image>
+                        </Grid>
+
+                        <TextBlock Text="OPTIGAMES" FontSize="46" FontWeight="Bold"
+                                   Foreground="{StaticResource B.Text}"
+                                   HorizontalAlignment="Center" Margin="0,4,0,0"/>
+
+                        <TextBlock Text="THE PLACE FOR PEAK PERFORMANCE"
+                                   FontSize="12" FontWeight="SemiBold"
+                                   Foreground="{StaticResource B.Accent}"
+                                   HorizontalAlignment="Center" Margin="0,10,0,0"/>
+
+                        <TextBlock Style="{StaticResource T.Body}" MaxWidth="500" Margin="0,26,0,0"
+                                   TextAlignment="Center" HorizontalAlignment="Center"
+                                   Text="This takes about a minute. We will look at your hardware, take a restore point so nothing here is permanent, and then hand you the controls."/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- 2. Hardware -->
+                <Grid Style="{StaticResource S.Step}" VerticalAlignment="Center"
+                      Visibility="{Binding IsHardware, Converter={StaticResource Vis}}">
+                    <StackPanel HorizontalAlignment="Center" Width="620">
+                        <TextBlock Text="This is your machine" FontSize="28" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Style="{StaticResource T.Body}" TextAlignment="Center"
+                                   Margin="0,10,0,26" HorizontalAlignment="Center"
+                                   Text="Detected automatically — nothing was sent anywhere."/>
+
+                        <ItemsControl ItemsSource="{Binding Specs}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource S.Card}" Margin="0,0,0,8" Padding="18,14">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="120"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Path Grid.Column="0" Width="18" Height="18" Stretch="Uniform"
+                                                  Data="{Binding Icon, Converter={StaticResource Icon}}"
+                                                  Stroke="{StaticResource B.Accent}" StrokeThickness="1.4"
+                                                  StrokeLineJoin="Round" StrokeStartLineCap="Round"
+                                                  StrokeEndLineCap="Round" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Label}"
+                                                       Margin="14,0,0,0" FontSize="12.5"
+                                                       Foreground="{StaticResource B.TextDim}"
+                                                       VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding Value}" FontSize="12.5"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Grid>
+
+                <!-- 3. Restore point (gated) -->
+                <Grid Style="{StaticResource S.Step}" VerticalAlignment="Center"
+                      Visibility="{Binding IsRestore, Converter={StaticResource Vis}}">
+                    <StackPanel HorizontalAlignment="Center" Width="560">
+
+                        <Grid Width="120" Height="120" HorizontalAlignment="Center">
+                            <Ellipse Margin="-24">
+                                <Ellipse.Fill>
+                                    <RadialGradientBrush>
+                                        <GradientStop Color="#4DFF0000" Offset="0"/>
+                                        <GradientStop Color="#00FF0000" Offset="1"/>
+                                    </RadialGradientBrush>
+                                </Ellipse.Fill>
+                            </Ellipse>
+
+                            <!-- Spins only while the checkpoint is being written -->
+                            <Ellipse Width="112" Height="112" Stroke="{StaticResource B.Accent}"
+                                     StrokeThickness="2" StrokeDashArray="14 8" Opacity="0.55"
+                                     RenderTransformOrigin="0.5,0.5"
+                                     Visibility="{Binding IsWorking, Converter={StaticResource Vis}}">
+                                <Ellipse.RenderTransform>
+                                    <RotateTransform x:Name="Spin"/>
+                                </Ellipse.RenderTransform>
+                                <Ellipse.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever">
+                                                <DoubleAnimation Storyboard.TargetName="Spin"
+                                                                 Storyboard.TargetProperty="Angle"
+                                                                 From="0" To="360" Duration="0:0:2.2"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Ellipse.Triggers>
+                            </Ellipse>
+
+                            <Path Data="{StaticResource I.Shield}" Stretch="Uniform" Margin="26"
+                                  Stroke="{StaticResource B.Accent}" StrokeThickness="1.1"
+                                  StrokeLineJoin="Round" StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"/>
+                        </Grid>
+
+                        <TextBlock Text="First, a safety net" FontSize="28" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" Margin="0,26,0,0"/>
+
+                        <TextBlock Style="{StaticResource T.Body}" TextAlignment="Center"
+                                   HorizontalAlignment="Center" Margin="0,12,0,0"
+                                   Text="Before OptiGames changes anything, Windows takes a snapshot of your system. If a tweak ever misbehaves, you roll back to right now in one step. This is required — the rest of the app stays locked until it is done."/>
+
+                        <Button Content="Create restore point" Style="{StaticResource S.ButtonPrimary}"
+                                HorizontalAlignment="Center" Margin="0,26,0,0" MinWidth="230"
+                                Command="{Binding CreateRestorePointCommand}"
+                                Visibility="{Binding RestorePointReady, Converter={StaticResource VisInv}}"/>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,26,0,0"
+                                    Visibility="{Binding RestorePointReady, Converter={StaticResource Vis}}">
+                            <Path Data="{StaticResource I.Check}" Width="20" Height="20" Stretch="Uniform"
+                                  Stroke="{StaticResource B.Good}" StrokeThickness="2.2"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                  StrokeLineJoin="Round" VerticalAlignment="Center"/>
+                            <TextBlock Text="Protected" FontSize="15" FontWeight="SemiBold"
+                                       Foreground="{StaticResource B.Good}" Margin="10,0,0,0"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <TextBlock Text="{Binding RestoreStatus}" Style="{StaticResource T.Body}"
+                                   TextAlignment="Center" HorizontalAlignment="Center" Margin="0,14,0,0"
+                                   Visibility="{Binding RestoreStatus, Converter={StaticResource VisStr}}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- 4. Ready -->
+                <Grid Style="{StaticResource S.Step}" VerticalAlignment="Center"
+                      Visibility="{Binding IsReady, Converter={StaticResource Vis}}">
+                    <StackPanel HorizontalAlignment="Center" Width="600">
+
+                        <!-- The tick draws itself in by animating the dash offset. -->
+                        <Grid Width="96" Height="96" HorizontalAlignment="Center">
+                            <Ellipse Stroke="{StaticResource B.Accent}" StrokeThickness="1.5" Opacity="0.4"/>
+                            <Path x:Name="Tick" Data="{StaticResource I.Check}" Stretch="Uniform"
+                                  Margin="26" Stroke="{StaticResource B.Accent}" StrokeThickness="2.2"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                  StrokeLineJoin="Round" StrokeDashArray="1 1" StrokeDashOffset="1">
+                                <Path.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="Tick"
+                                                                 Storyboard.TargetProperty="StrokeDashOffset"
+                                                                 From="1" To="0" Duration="0:0:0.5"
+                                                                 BeginTime="0:0:0.2">
+                                                    <DoubleAnimation.EasingFunction>
+                                                        <CubicEase EasingMode="EaseOut"/>
+                                                    </DoubleAnimation.EasingFunction>
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Path.Triggers>
+                            </Path>
+                        </Grid>
+
+                        <TextBlock Text="You're set up" FontSize="28" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" Margin="0,24,0,0"/>
+
+                        <TextBlock Style="{StaticResource T.Body}" TextAlignment="Center"
+                                   HorizontalAlignment="Center" Margin="0,12,0,26"
+                                   Text="Four pages, and a short explainer the first time you open each one."/>
+
+                        <UniformGrid Columns="2">
+                            <Border Style="{StaticResource S.Card}" Margin="0,0,6,6" Padding="16,14">
+                                <StackPanel>
+                                    <TextBlock Text="Optimize" Style="{StaticResource T.CardTitle}"/>
+                                    <TextBlock Text="Stage tweaks, apply them in one pass, flip any back off."
+                                               Style="{StaticResource T.Body}" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource S.Card}" Margin="6,0,0,6" Padding="16,14">
+                                <StackPanel>
+                                    <TextBlock Text="Clean Drive" Style="{StaticResource T.CardTitle}"/>
+                                    <TextBlock Text="Reclaim caches Windows leaves behind."
+                                               Style="{StaticResource T.Body}" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource S.Card}" Margin="0,6,6,0" Padding="16,14">
+                                <StackPanel>
+                                    <TextBlock Text="Restore Point" Style="{StaticResource T.CardTitle}"/>
+                                    <TextBlock Text="Snapshot now, roll back later. Nothing is permanent."
+                                               Style="{StaticResource T.Body}" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource S.Card}" Margin="6,6,0,0" Padding="16,14">
+                                <StackPanel>
+                                    <TextBlock Text="Home" Style="{StaticResource T.CardTitle}"/>
+                                    <TextBlock Text="Your hardware and what has been changed so far."
+                                               Style="{StaticResource T.Body}" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+            <!-- ===================== Footer ===================== -->
+            <StackPanel Grid.Row="2" HorizontalAlignment="Center">
+                <Button Content="{Binding NextLabel}" Style="{StaticResource S.ButtonPrimary}"
+                        Command="{Binding NextCommand}" MinWidth="230" Padding="18,13"/>
+
+                <TextBlock Text="Waiting on your restore point…"
+                           FontSize="11.5" HorizontalAlignment="Center" Margin="0,12,0,0">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource T.Body}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsRestore}" Value="True"/>
+                                        <Condition Binding="{Binding RestorePointReady}" Value="False"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,66 @@
+name: Release
+
+# Tag a commit to ship it:  git tag v1.0.0 && git push origin v1.0.0
+# The installer reads /releases/latest/download, so whatever this publishes is
+# what `irm optigames.gg/cli | iex` hands people.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    # WPF only builds on Windows.
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Derive version from tag
+        id: version
+        shell: pwsh
+        run: |
+          $tag = if ($env:GITHUB_REF -like 'refs/tags/*') { $env:GITHUB_REF -replace '^refs/tags/v?', '' } else { '0.0.0' }
+          "version=$tag" >> $env:GITHUB_OUTPUT
+          "Building $tag"
+
+      - name: Build
+        run: dotnet build --configuration Release --nologo
+
+      - name: Publish single-file executable
+        shell: pwsh
+        run: |
+          dotnet publish src/OptiGames/OptiGames.csproj `
+            -c Release -r win-x64 `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:EnableCompressionInSingleFile=true `
+            -p:Version=${{ steps.version.outputs.version }} `
+            -o publish
+
+      - name: Publish the hash alongside it
+        shell: pwsh
+        run: |
+          # The installer refuses to run anything whose hash does not match this
+          # file, so it has to ship with every release.
+          $hash = (Get-FileHash publish/OptiGames.exe -Algorithm SHA256).Hash
+          Set-Content -Path publish/OptiGames.exe.sha256 -Value $hash -NoNewline
+          Write-Host "SHA256: $hash"
+
+      - name: Attach to the release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            publish/OptiGames.exe
+            publish/OptiGames.exe.sha256
+          generate_release_notes: true
+          fail_on_unmatched_files: true

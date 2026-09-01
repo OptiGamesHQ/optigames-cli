@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>OptiGames.Core</RootNamespace>
+    <AssemblyName>OptiGames.Core</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="8.0.0" />
+  </ItemGroup>
+
+  <!-- Shipped inside the exe and extracted to %LOCALAPPDATA%\OptiGamesTool on demand,
+       so the one-line installer stays a single download. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Payloads\**" LogicalName="OptiGames.Core.Payloads.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

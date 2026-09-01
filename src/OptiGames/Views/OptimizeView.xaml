@@ -1,0 +1,413 @@
+<UserControl x:Class="OptiGames.Views.OptimizeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <!-- Page entrance: fade up over 260ms. The transform is declared inline on the root so
+         nothing is shared with another element. -->
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="PageRoot"
+                                     Storyboard.TargetProperty="Opacity"
+                                     From="0" To="1" Duration="0:0:0.26">
+                        <DoubleAnimation.EasingFunction>
+                            <CubicEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                    <DoubleAnimation Storyboard.TargetName="PageRoot"
+                                     Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                     From="16" To="0" Duration="0:0:0.26">
+                        <DoubleAnimation.EasingFunction>
+                            <CubicEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </UserControl.Triggers>
+
+    <Grid x:Name="PageRoot" Opacity="0">
+        <Grid.RenderTransform>
+            <TranslateTransform Y="16"/>
+        </Grid.RenderTransform>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ===== Hero banner ===== -->
+        <Border Grid.Row="0" Style="{StaticResource S.Card}" Height="148"
+                Margin="28,0,28,16" ClipToBounds="True">
+            <Grid>
+                <!-- The render lives on the right half at full brightness and is faded into
+                     the card on its left edge, rather than being dimmed everywhere by a
+                     full-width scrim that would leave nothing to see. The hero frame puts a
+                     rail and two brackets around it so it reads as mounted hardware. -->
+                <ContentControl HorizontalAlignment="Right" Width="620"
+                                Style="{StaticResource S.HeroFrame}">
+                    <Grid ClipToBounds="True">
+                        <!-- Explicit 620x349 keeps the source's 16:9 ratio exactly, so Fill does
+                             not distort, and centring it puts the bolt on the banner's midline
+                             instead of letting UniformToFill crop from the top. -->
+                        <Image Source="/Assets/hero-optimize.png" Stretch="Fill"
+                               Width="620" Height="349" VerticalAlignment="Center"
+                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                        <Border>
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#FF121215" Offset="0"/>
+                                    <GradientStop Color="#00121215" Offset="0.45"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                    </Grid>
+                </ContentControl>
+
+                <StackPanel VerticalAlignment="Center" Margin="26,0" MaxWidth="430"
+                            HorizontalAlignment="Left">
+                    <TextBlock Text="Tune Windows for games" Style="{StaticResource T.PageTitle}"
+                               FontSize="19"/>
+                    <TextBlock Style="{StaticResource T.Body}" Margin="0,8,0,0"
+                               HorizontalAlignment="Left"
+                               Text="Flip what you want, then apply. Every switch here works both ways — turning one back off restores the Windows default."/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ===== Tweak groups ===== -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="28,0,20,20">
+            <ItemsControl ItemsSource="{Binding Groups}" Margin="0,0,8,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="0,0,0,26">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Style.Triggers>
+                                        <!-- The advanced group disappears entirely when the
+                                             Settings switch is off, rather than greying out. -->
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding IsAdvanced}" Value="True"/>
+                                                <Condition Binding="{Binding DataContext.ShowAdvanced,
+                                                           RelativeSource={RelativeSource AncestorType=Window}}"
+                                                           Value="False"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+
+                            <!-- Heading and blurb sit at 0 so their left edge lines up with the
+                                 cards underneath them. -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                                <TextBlock Text="{Binding Header}" Style="{StaticResource T.CardTitle}"
+                                           FontSize="15"/>
+                                <Border Background="{StaticResource B.AccentWash}" CornerRadius="5"
+                                        Padding="7,2" Margin="10,1,0,0" VerticalAlignment="Center"
+                                        Visibility="{Binding IsAdvanced, Converter={StaticResource Vis}}">
+                                    <TextBlock Text="HANDLE WITH CARE" FontSize="9.5" FontWeight="Bold"
+                                               Foreground="{StaticResource B.Accent}"/>
+                                </Border>
+                            </StackPanel>
+
+                            <TextBlock Text="{Binding Blurb}" Style="{StaticResource T.Body}"
+                                       Margin="0,0,0,12" MaxWidth="700" HorizontalAlignment="Left"/>
+
+                            <ItemsControl ItemsSource="{Binding Items}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="2"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="0,0,10,10" Padding="18,16">
+                                            <!-- Inline transform: a transform declared in a Style
+                                                 setter is shared by every card using that style. -->
+                                            <Border.RenderTransform>
+                                                <TranslateTransform x:Name="CardLift" Y="0"/>
+                                            </Border.RenderTransform>
+
+                                            <Border.Style>
+                                                <Style TargetType="Border" BasedOn="{StaticResource S.HoverCard}">
+                                                    <Style.Triggers>
+                                                        <!-- A staged-but-uncommitted row gets a red
+                                                             edge so pending work is visible without
+                                                             reading the count at the bottom. -->
+                                                        <DataTrigger Binding="{Binding IsPending}" Value="True">
+                                                            <Setter Property="BorderBrush"
+                                                                    Value="{StaticResource B.AccentEdge}"/>
+                                                            <Setter Property="Background" Value="#FF161114"/>
+                                                        </DataTrigger>
+
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="BorderBrush"
+                                                                    Value="{StaticResource B.AccentEdge}"/>
+                                                            <Trigger.EnterActions>
+                                                                <BeginStoryboard>
+                                                                    <Storyboard>
+                                                                        <DoubleAnimation
+                                                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                                                            To="-2" Duration="0:0:0.13">
+                                                                            <DoubleAnimation.EasingFunction>
+                                                                                <CubicEase EasingMode="EaseOut"/>
+                                                                            </DoubleAnimation.EasingFunction>
+                                                                        </DoubleAnimation>
+                                                                    </Storyboard>
+                                                                </BeginStoryboard>
+                                                            </Trigger.EnterActions>
+                                                            <Trigger.ExitActions>
+                                                                <BeginStoryboard>
+                                                                    <Storyboard>
+                                                                        <DoubleAnimation
+                                                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                                                            To="0" Duration="0:0:0.13">
+                                                                            <DoubleAnimation.EasingFunction>
+                                                                                <CubicEase EasingMode="EaseOut"/>
+                                                                            </DoubleAnimation.EasingFunction>
+                                                                        </DoubleAnimation>
+                                                                    </Storyboard>
+                                                                </BeginStoryboard>
+                                                            </Trigger.ExitActions>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+
+                                            <StackPanel>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="{Binding Name}"
+                                                               Style="{StaticResource T.CardTitle}"
+                                                               TextWrapping="Wrap" Margin="0,0,12,0"
+                                                               VerticalAlignment="Center"/>
+                                                    <ToggleButton Grid.Column="1"
+                                                                  Style="{StaticResource S.ToggleTriState}"
+                                                                  VerticalAlignment="Center"
+                                                                  IsChecked="{Binding IsStaged, Mode=TwoWay}"/>
+                                                </Grid>
+
+                                                <TextBlock Text="{Binding Description}"
+                                                           Style="{StaticResource T.Body}"
+                                                           Margin="0,9,0,0"/>
+
+                                                <!-- Warning badge for anything that weakens security -->
+                                                <Border Background="#1AFFB020" CornerRadius="7"
+                                                        Padding="10,8" Margin="0,10,0,0"
+                                                        Visibility="{Binding HasWarning,
+                                                                     Converter={StaticResource Vis}}">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Path Style="{StaticResource S.Icon}"
+                                                              Data="{StaticResource I.Warning}"
+                                                              Width="14" Height="14"
+                                                              Stroke="{StaticResource B.Warn}"
+                                                              StrokeThickness="1.6"
+                                                              VerticalAlignment="Top" Margin="0,1,8,0"/>
+                                                        <TextBlock Text="{Binding Warning}" FontSize="11.5"
+                                                                   Foreground="{StaticResource B.Warn}"
+                                                                   TextWrapping="Wrap" MaxWidth="290"/>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                                    <!-- The tick means state is never carried by
+                                                         colour alone. -->
+                                                    <Path Style="{StaticResource S.Icon}"
+                                                          Data="{StaticResource I.Check}"
+                                                          Width="13" Height="13" StrokeThickness="2.2"
+                                                          Stroke="{StaticResource B.Good}"
+                                                          Margin="0,0,6,0"
+                                                          Visibility="{Binding IsApplied,
+                                                                       Converter={StaticResource Vis}}"/>
+                                                    <TextBlock Text="{Binding StatusText}" FontSize="11.5"
+                                                               FontWeight="SemiBold"
+                                                               VerticalAlignment="Center"
+                                                               Foreground="{Binding IsApplied,
+                                                                            Converter={StaticResource StatusBrush}}"/>
+                                                    <TextBlock Text="· restart required" FontSize="11.5"
+                                                               Margin="8,0,0,0" VerticalAlignment="Center"
+                                                               Foreground="{StaticResource B.TextMuted}"
+                                                               Visibility="{Binding RequiresReboot,
+                                                                            Converter={StaticResource Vis}}"/>
+
+                                                    <!-- Disclosure: exactly which values this
+                                                         writes, before it writes them. -->
+                                                    <Button Style="{StaticResource S.ButtonGhost}"
+                                                            Padding="8,3" Margin="10,0,0,0"
+                                                            FontSize="11" FontWeight="Normal"
+                                                            VerticalAlignment="Center"
+                                                            Command="{Binding ToggleChangesCommand}"
+                                                            Content="{Binding ChangesLabel}"
+                                                            Visibility="{Binding HasChanges,
+                                                                         Converter={StaticResource Vis}}"/>
+                                                </StackPanel>
+
+                                                <Border Margin="0,10,0,0" CornerRadius="7"
+                                                        Background="#FF0B0B0D"
+                                                        BorderBrush="{StaticResource B.Border}"
+                                                        BorderThickness="1"
+                                                        Visibility="{Binding IsChangesOpen,
+                                                                     Converter={StaticResource Vis}}">
+                                                    <ScrollViewer MaxHeight="190" Padding="12,10"
+                                                                  VerticalScrollBarVisibility="Auto">
+                                                        <ItemsControl ItemsSource="{Binding Changes}">
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <StackPanel Margin="0,0,0,8">
+                                                                        <TextBlock Text="{Binding Path}"
+                                                                                   FontFamily="Cascadia Mono, Consolas"
+                                                                                   FontSize="10.5"
+                                                                                   Foreground="{StaticResource B.TextDim}"
+                                                                                   TextWrapping="Wrap"/>
+                                                                        <StackPanel Orientation="Horizontal"
+                                                                                    Margin="0,2,0,0">
+                                                                            <TextBlock Text="on:" FontSize="10.5"
+                                                                                       Foreground="{StaticResource B.TextMuted}"/>
+                                                                            <TextBlock Text="{Binding On}" FontSize="10.5"
+                                                                                       Margin="4,0,12,0"
+                                                                                       FontFamily="Cascadia Mono, Consolas"
+                                                                                       Foreground="{StaticResource B.Accent}"/>
+                                                                            <TextBlock Text="off:" FontSize="10.5"
+                                                                                       Foreground="{StaticResource B.TextMuted}"/>
+                                                                            <TextBlock Text="{Binding Off}" FontSize="10.5"
+                                                                                       Margin="4,0,0,0"
+                                                                                       FontFamily="Cascadia Mono, Consolas"
+                                                                                       Foreground="{StaticResource B.Good}"/>
+                                                                        </StackPanel>
+                                                                    </StackPanel>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                    </ScrollViewer>
+                                                </Border>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- ===== Commit bar ===== -->
+        <Border Grid.Row="2" Background="#FF0C0C0E" BorderBrush="{StaticResource B.Border}"
+                BorderThickness="0,1,0,0" Padding="28,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Style="{StaticResource T.CardTitle}" FontSize="13"
+                               Text="{Binding ApplyLabel}"/>
+
+                    <StackPanel Visibility="{Binding IsIdle, Converter={StaticResource Vis}}">
+                        <TextBlock Style="{StaticResource T.Body}" FontSize="11.5" Margin="0,3,0,0">
+                            <Run Text="{Binding AppliedCount, Mode=OneWay}"/>
+                            <Run Text="of"/>
+                            <Run Text="{Binding TotalCount, Mode=OneWay}"/>
+                            <Run Text="tweaks currently applied"/>
+                        </TextBlock>
+
+                        <!-- Measurement rule under the readout, as on the reference panel. -->
+                        <Border Height="12" Width="216" HorizontalAlignment="Left" Margin="0,5,0,0"
+                                Background="{StaticResource B.TickScaleDim}"/>
+                    </StackPanel>
+
+                    <StackPanel Visibility="{Binding IsBusy, Converter={StaticResource Vis}}"
+                                Margin="0,7,0,0">
+                        <!-- Progress plus a highlight that sweeps while work is running. -->
+                        <Grid Width="320" HorizontalAlignment="Left" ClipToBounds="True">
+                            <ProgressBar Style="{StaticResource S.Progress}" Maximum="1"
+                                         Value="{Binding Progress, Mode=OneWay}"/>
+                            <Border Width="88" HorizontalAlignment="Left" CornerRadius="2"
+                                    IsHitTestVisible="False">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <GradientStop Color="#00FFFFFF" Offset="0"/>
+                                        <GradientStop Color="#59FFFFFF" Offset="0.5"/>
+                                        <GradientStop Color="#00FFFFFF" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.RenderTransform>
+                                    <TranslateTransform X="-88"/>
+                                </Border.RenderTransform>
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Opacity" Value="0"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                                                <Setter Property="Opacity" Value="1"/>
+                                                <DataTrigger.EnterActions>
+                                                    <BeginStoryboard x:Name="SweepSb">
+                                                        <Storyboard RepeatBehavior="Forever">
+                                                            <DoubleAnimation
+                                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                                From="-88" To="320" Duration="0:0:1.4"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </DataTrigger.EnterActions>
+                                                <DataTrigger.ExitActions>
+                                                    <StopStoryboard BeginStoryboardName="SweepSb"/>
+                                                </DataTrigger.ExitActions>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+                        </Grid>
+                        <TextBlock Text="{Binding ProgressLabel}" FontSize="11.5" Margin="0,6,0,0"
+                                   Foreground="{StaticResource B.TextDim}"/>
+                    </StackPanel>
+
+                    <Border Background="#1AFFB020" CornerRadius="6" Padding="10,6" Margin="0,8,0,0"
+                            HorizontalAlignment="Left"
+                            Visibility="{Binding RebootPending, Converter={StaticResource Vis}}">
+                        <TextBlock Text="Restart your PC to finish applying these changes."
+                                   FontSize="11.5" Foreground="{StaticResource B.Warn}"/>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Undo the batch that was just committed, rather than making the user find
+                         and flip every switch again. Withdrawn once taken. -->
+                    <Border CornerRadius="7" Padding="12,6" Margin="0,0,12,0"
+                            Background="#1A35C759" BorderThickness="1" BorderBrush="#4D35C759"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding CanUndo, Converter={StaticResource Vis}}">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Style="{StaticResource S.Icon}" Data="{StaticResource I.Check}"
+                                  Width="13" Height="13" StrokeThickness="2.2"
+                                  Stroke="{StaticResource B.Good}" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding UndoLabel}" FontSize="11.5"
+                                       FontWeight="SemiBold" VerticalAlignment="Center"
+                                       Foreground="{StaticResource B.Good}"/>
+                            <Button Content="Undo" Style="{StaticResource S.ButtonGhost}"
+                                    Padding="8,2" Margin="10,0,0,0" FontSize="11.5"
+                                    Command="{Binding UndoCommand}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Button Content="Select recommended" Style="{StaticResource S.ButtonGhost}"
+                            Command="{Binding SelectRecommendedCommand}"/>
+                    <Button Content="Reset" Style="{StaticResource S.ButtonGhost}" Margin="4,0,12,0"
+                            Command="{Binding ClearCommand}"/>
+                    <Button Content="Apply" Style="{StaticResource S.ButtonPrimary}"
+                            Command="{Binding ApplyCommand}" MinWidth="140"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
