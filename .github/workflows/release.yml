@@ -2,7 +2,7 @@ name: Release
 
 # Tag a commit to ship it:  git tag v1.0.0 && git push origin v1.0.0
 # The installer reads /releases/latest/download, so whatever this publishes is
-# what `irm optigames.gg/cli | iex` hands people.
+# what `irm optigamesbeta.online/cli | iex` hands people.
 on:
   push:
     tags:

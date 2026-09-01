@@ -1,7 +1,7 @@
 <#
     OptiGames bootstrap.
 
-        irm optigames.gg/cli | iex
+        irm optigamesbeta.online/cli | iex
 
     Downloads the current OptiGames build into %LOCALAPPDATA%\OptiGamesTool and launches it
     elevated. Re-running is cheap: the download is skipped when the local copy already matches

@@ -19,7 +19,7 @@
 Open PowerShell and run:
 
 ```powershell
-irm optigames.gg/cli | iex
+irm optigamesbeta.online/cli | iex
 ```
 
 That downloads the current release, checks it against the published SHA-256, and
@@ -119,7 +119,7 @@ src/OptiGames/          WPF app
   Views/ ViewModels/    One view per page
   Theme.xaml            Palette, control templates, motion
   Icons.xaml            Icon geometry set
-bootstrap/optigames.ps1 What `irm optigames.gg/cli | iex` runs
+bootstrap/optigames.ps1 What `irm optigamesbeta.online/cli | iex` runs
 ```
 
 Adding a tweak means adding one entry to `TweakCatalog.cs` with its on-state and
