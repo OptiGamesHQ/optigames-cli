@@ -146,7 +146,10 @@ public sealed class OnboardingViewModel : ObservableObject
         RestoreFailed = false;
         RestoreStatus = "Creating your first restore point…";
 
-        bool ok = await _main.Restore.CreateAsync("OptiGames — before any changes");
+        // Plain hyphen, not an em dash. This string is passed through to
+        // Checkpoint-Computer and then shown in Windows' own System Restore list, which
+        // is not somewhere to find out that a non-ASCII character did not survive the trip.
+        bool ok = await _main.Restore.CreateAsync("OptiGames - First Restore Point");
 
         if (ok)
         {

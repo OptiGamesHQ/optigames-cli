@@ -81,7 +81,10 @@ public sealed class RestorePointViewModel : PageViewModel
         IsBusy = true;
         Status = "Creating restore point — this can take up to a minute…";
 
-        var name = description ?? $"OptiGames — {DateTime.Now:d MMM yyyy HH:mm}";
+        // Points made by hand keep a timestamp: several of them named identically is a list
+        // you cannot choose from in Windows' own restore dialog. The onboarding one is the
+        // exception and is named outright, because there is only ever one of it.
+        var name = description ?? $"OptiGames - {DateTime.Now:d MMM yyyy HH:mm}";
         bool ok = await Task.Run(() => _service.Create(name));
 
         Refresh();
