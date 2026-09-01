@@ -13,6 +13,16 @@
                 <DataTrigger Binding="{Binding Accent}" Value="True">
                     <Setter Property="Stroke" Value="{StaticResource B.Accent}"/>
                 </DataTrigger>
+
+                <!-- A solid brand mark. Stroke is cleared and Fill takes over, and it is
+                     scaled up slightly because a filled shape reads smaller than an
+                     outlined one at the same box size. -->
+                <DataTrigger Binding="{Binding Filled}" Value="True">
+                    <Setter Property="Stroke" Value="{x:Null}"/>
+                    <Setter Property="Fill" Value="{StaticResource B.TextDim}"/>
+                    <Setter Property="Width" Value="22"/>
+                    <Setter Property="Height" Value="22"/>
+                </DataTrigger>
             </Style.Triggers>
         </Style>
 
@@ -150,7 +160,7 @@
                                 HorizontalContentAlignment="Stretch"
                                 Command="{Binding DataContext.OpenCommand,
                                           RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                CommandParameter="{Binding Url}"/>
+                                CommandParameter="{Binding}"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

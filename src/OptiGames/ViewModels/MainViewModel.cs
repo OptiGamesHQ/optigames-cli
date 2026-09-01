@@ -46,7 +46,7 @@ public sealed class MainViewModel : ObservableObject
         Optimize = new OptimizeViewModel(this, engine, catalog) { Title = "Optimize", Icon = "I.Bolt" };
         Clean = new CleanDriveViewModel(this, cleanupService) { Title = "Clean Drive", Icon = "I.Disk" };
         Restore = new RestorePointViewModel(this, restoreService) { Title = "Restore Point", Icon = "I.Shield" };
-        Help = new HelpViewModel { Title = "Help", Icon = "I.Help", IsFooter = true };
+        Help = new HelpViewModel(this) { Title = "Help", Icon = "I.Help", IsFooter = true };
         Settings = new SettingsViewModel(this) { Title = "Settings", Icon = "I.Settings", IsFooter = true };
 
         Pages = new ObservableCollection<PageViewModel> { Home, Optimize, Clean, Restore, Help, Settings };
@@ -54,6 +54,7 @@ public sealed class MainViewModel : ObservableObject
         FooterPages = new ObservableCollection<PageViewModel>(Pages.Where(p => p.IsFooter));
 
         Onboarding = new OnboardingViewModel(this);
+        BugReport = new BugReportViewModel(this, new SupportService(_log));
 
         // Both read once at startup: Home summarises the tweak count and the newest restore
         // point, and would otherwise report zero until you visit those pages yourself.
@@ -78,6 +79,21 @@ public sealed class MainViewModel : ObservableObject
     public HelpViewModel Help { get; }
     public SettingsViewModel Settings { get; }
     public OnboardingViewModel Onboarding { get; }
+    public BugReportViewModel BugReport { get; }
+
+    // ---------------------------------------------------------------- bug report
+
+    private bool _isBugReportOpen;
+    public bool IsBugReportOpen { get => _isBugReportOpen; private set => Set(ref _isBugReportOpen, value); }
+
+    /// <summary>
+    /// Opened from the Help page instead of sending the user to a browser. The report carries the
+    /// hardware, the applied tweaks and the tail of the action log, none of which the user could
+    /// reasonably supply by hand.
+    /// </summary>
+    public void OpenBugReport() => IsBugReportOpen = true;
+
+    public void CloseBugReport() => IsBugReportOpen = false;
 
     private PageViewModel _current;
     public PageViewModel Current

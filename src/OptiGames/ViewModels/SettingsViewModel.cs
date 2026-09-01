@@ -4,7 +4,20 @@ using OptiGames.Core.Services;
 
 namespace OptiGames.ViewModels;
 
-public sealed record HelpLink(string Icon, string Title, string Blurb, string Url, bool Accent = false);
+/// <summary>
+/// A row on the Help page. <paramref name="Filled"/> marks an icon that is a solid logo rather
+/// than one of the stroked glyphs in Icons.xaml, so the view fills it instead of stroking it —
+/// a brand mark drawn as an outline reads as the wrong logo, not as a house style.
+/// </summary>
+public sealed record HelpLink(
+    string Icon,
+    string Title,
+    string Blurb,
+    string Url,
+    bool Accent = false,
+    bool Filled = false,
+    /// <summary>Opens the in-app report form instead of navigating to <paramref name="Url"/>.</summary>
+    bool OpensReportForm = false);
 
 public sealed class SettingsViewModel : PageViewModel
 {
@@ -49,11 +62,20 @@ public sealed class SettingsViewModel : PageViewModel
 
 public sealed class HelpViewModel : PageViewModel
 {
-    public HelpViewModel()
+    private readonly MainViewModel _main;
+
+    public HelpViewModel(MainViewModel main)
     {
+        _main = main;
+
+        // One command for every row. A link opens its URL; the bug row opens the in-app form,
+        // because a report filed from here can carry the hardware, the applied tweaks and the
+        // action log, none of which a browser form could ask the user to supply.
         OpenCommand = new RelayCommand(p =>
         {
-            if (p is string url) SettingsViewModel.OpenPath(url);
+            if (p is not HelpLink link) return;
+            if (link.OpensReportForm) _main.OpenBugReport();
+            else SettingsViewModel.OpenPath(link.Url);
         });
     }
 
@@ -66,10 +88,10 @@ public sealed class HelpViewModel : PageViewModel
                      "mailto:support@optigames.gg"),
         new HelpLink("I.Discord", "Join the Discord",
                      "Talk to the team and other players, and hear about updates first.",
-                     "https://optigames.gg/discord"),
+                     "https://discord.com/invite/FeagtcsxXm", Filled: true),
         new HelpLink("I.Bug", "Report a bug",
-                     "Found something broken? Tell us what happened and we will fix it.",
-                     "https://optigames.gg/report", Accent: true),
+                     "Something broken? Send it with screenshots and your system details.",
+                     "", Accent: true, OpensReportForm: true),
         new HelpLink("I.Globe", "Visit the website",
                      "Guides, changelogs and the latest build.",
                      "https://optigames.gg"),

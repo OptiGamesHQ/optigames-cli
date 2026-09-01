@@ -154,6 +154,15 @@
                 </Border>
             </Grid>
 
+            <!-- ==================== Bug report ====================
+                 Above the modal so a confirmation dialog raised while it is open still
+                 lands on top, below onboarding so a first run is never interrupted. -->
+            <views:BugReportView Grid.ColumnSpan="2" Panel.ZIndex="60"
+                                 DataContext="{Binding BugReport}"
+                                 Visibility="{Binding DataContext.IsBugReportOpen,
+                                              RelativeSource={RelativeSource AncestorType=Window},
+                                              Converter={StaticResource Vis}}"/>
+
             <!-- ==================== Onboarding ==================== -->
             <views:OnboardingView Grid.ColumnSpan="2" Panel.ZIndex="100"
                                   DataContext="{Binding Onboarding}"
