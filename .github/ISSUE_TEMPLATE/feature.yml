@@ -1,0 +1,29 @@
+name: Feature request
+description: Propose a focused improvement to OptiGames
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the user problem before proposing an implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Explain what OptiGames should do and how the user would reverse it.
+    validations:
+      required: true
+  - type: textarea
+    id: windows_changes
+    attributes:
+      label: Windows changes involved
+      description: List known registry paths, services, policies, commands, files, or driver settings.
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Risks and tradeoffs
+      description: Include security, privacy, anti-cheat, update, and compatibility concerns.
