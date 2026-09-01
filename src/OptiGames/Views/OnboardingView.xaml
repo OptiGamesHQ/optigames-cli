@@ -168,7 +168,10 @@
                             </Image>
                         </Grid>
 
-                        <TextBlock Text="OPTIGAMES" FontSize="46" FontWeight="Bold"
+                        <!-- The display face. No FontWeight: it ships one weight, and asking
+                             for Bold makes WPF synthesise a smeared fake-bold over it. -->
+                        <TextBlock Text="OPTIGAMES" FontSize="52"
+                                   FontFamily="{StaticResource F.Display}"
                                    Foreground="{StaticResource B.Text}"
                                    HorizontalAlignment="Center" Margin="0,4,0,0"/>
 

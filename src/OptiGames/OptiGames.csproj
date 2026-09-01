@@ -24,6 +24,9 @@
     <Resource Include="Assets\logo.png" />
     <Resource Include="Assets\brand-banner.png" />
     <Resource Include="Assets\optigames.ico" />
+    <!-- Embedded rather than installed. A font the app needs cannot depend on the user
+         having installed it, and WPF resolves it from the assembly at runtime. -->
+    <Resource Include="Assets\Fonts\*.ttf" />
   </ItemGroup>
 
 </Project>

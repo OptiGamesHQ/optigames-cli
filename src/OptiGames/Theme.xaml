@@ -73,6 +73,13 @@
 
     <FontFamily x:Key="F.Ui">Segoe UI Variable Display, Segoe UI, Inter</FontFamily>
 
+    <!-- The display face, used only for the wordmark on the welcome screen.
+         The path is the folder, the part after # is the font's INTERNAL family name
+         ("Excluded"), not the filename - WPF resolves embedded fonts by family, and
+         pointing it at the file name silently falls back to the default face.
+         Segoe UI Black is the fallback so a failure looks heavy rather than ordinary. -->
+    <FontFamily x:Key="F.Display">/Assets/Fonts/#Excluded, Segoe UI Black, Segoe UI</FontFamily>
+
     <Style x:Key="T.PageTitle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource F.Ui}"/>
         <Setter Property="FontSize" Value="21"/>
