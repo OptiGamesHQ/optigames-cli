@@ -1,0 +1,54 @@
+name: Installer
+
+# bootstrap/optigames.ps1 is what `irm optigames.gg/cli | iex` executes on other
+# people's machines. It gets two checks that the rest of the repo does not need.
+on:
+  push:
+    paths: ['bootstrap/**', '.github/workflows/installer.yml']
+  pull_request:
+    paths: ['bootstrap/**']
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: It must be ASCII only
+        shell: pwsh
+        run: |
+          # Windows PowerShell 5.1 reads a file with no BOM as ANSI, not UTF-8.
+          # A single em-dash inside a double-quoted string is therefore decoded
+          # into bytes that terminate the string early, and the whole script
+          # fails to parse. This shipped once already.
+          $bytes = [System.IO.File]::ReadAllBytes('bootstrap/optigames.ps1')
+          $bad = @()
+          $line = 1
+          foreach ($b in $bytes) {
+            if ($b -eq 10) { $line++ }
+            if ($b -gt 127) { $bad += "byte 0x$('{0:X2}' -f $b) near line $line" }
+          }
+          if ($bad.Count) {
+            Write-Host "::error::Installer contains non-ASCII bytes:"
+            $bad | Select-Object -First 10 | ForEach-Object { Write-Host "  $_" }
+            exit 1
+          }
+          Write-Host "ASCII only."
+
+      - name: It must parse as PowerShell
+        shell: pwsh
+        run: |
+          # Parse without executing. Anything that fails here would be piped
+          # straight into iex on a user's machine and throw a wall of parser
+          # errors that reads like the tool is broken.
+          $errs = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path 'bootstrap/optigames.ps1'), [ref]$null, [ref]$errs) | Out-Null
+          if ($errs -and $errs.Count) {
+            Write-Host "::error::Installer does not parse:"
+            $errs | ForEach-Object { Write-Host "  line $($_.Extent.StartLineNumber): $($_.Message)" }
+            exit 1
+          }
+          Write-Host "Parses clean."

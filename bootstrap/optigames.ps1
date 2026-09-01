@@ -24,8 +24,8 @@ function Write-Step($Message) {
 
 Write-Host ""
 Write-Host "  OPTIGAMES" -ForegroundColor Red -NoNewline
-Write-Host "  ·  Windows optimizer" -ForegroundColor DarkGray
-Write-Host "  open source · $RepoUrl" -ForegroundColor DarkGray
+Write-Host "  -  Windows optimizer" -ForegroundColor DarkGray
+Write-Host "  open source - $RepoUrl" -ForegroundColor DarkGray
 Write-Host ""
 
 # --- Preflight -------------------------------------------------------------
@@ -66,7 +66,7 @@ if ((Test-Path $ExePath) -and $remoteHash) {
 # --- Download --------------------------------------------------------------
 
 if ($needsDownload) {
-    if (-not $remoteHash) { throw "Cannot download OptiGames — the update server is unreachable." }
+    if (-not $remoteHash) { throw "Cannot download OptiGames - the update server is unreachable." }
 
     Write-Step "Downloading OptiGames..."
     $temp = "$ExePath.download"
