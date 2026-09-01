@@ -1,0 +1,55 @@
+name: Bug report
+description: Report reproducible behavior in the OptiGames desktop app
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping improve OptiGames. Do not attach registry exports, driver profile databases, or logs containing personal information.
+  - type: input
+    id: version
+    attributes:
+      label: OptiGames version
+      description: Find this in Settings or on the GitHub release page.
+      placeholder: v1.1.2
+    validations:
+      required: true
+  - type: dropdown
+    id: windows
+    attributes:
+      label: Windows version
+      options:
+        - Windows 11
+        - Windows 10
+        - Other or unknown
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What happened?
+      description: Include what you expected, what occurred, and any visible error message.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open Optimize
+        2. Enable ...
+        3. Press Apply
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add redacted screenshots or relevant hardware details if they help explain the issue.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I removed usernames, machine names, account information, and unrelated applications from attachments.
+          required: true
