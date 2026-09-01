@@ -210,6 +210,14 @@
                                FontSize="11.5" VerticalAlignment="Center"
                                Visibility="{Binding Status, Converter={StaticResource VisStr}}"/>
 
+                    <!-- Why Send is greyed out. Shares the row with Status, which is only ever
+                         set while sending — by which point the hint is empty. -->
+                    <TextBlock Text="{Binding SubmitHint}" Style="{StaticResource T.Body}"
+                               FontSize="11.5" VerticalAlignment="Center" TextWrapping="Wrap"
+                               MaxWidth="290" HorizontalAlignment="Left"
+                               Foreground="{StaticResource B.TextMuted}"
+                               Visibility="{Binding HasSubmitHint, Converter={StaticResource Vis}}"/>
+
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
                                 Visibility="{Binding IsSent, Converter={StaticResource VisInv}}">
                         <Button Content="Cancel" Style="{StaticResource S.ButtonGhost}"

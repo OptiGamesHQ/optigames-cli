@@ -68,10 +68,16 @@
                                                Margin="0,5,16,0"/>
                                 </StackPanel>
 
+                                <!-- "Leaves the app", so the row that opens the report form in
+                                     place does not get one. It is the same glyph the other three
+                                     rows use to promise a browser, and on that row it promised
+                                     the wrong thing. -->
                                 <Path x:Name="Arrow" Grid.Column="2"
                                       Style="{StaticResource S.Icon}"
                                       Width="16" Height="16"
                                       Data="{StaticResource I.External}"
+                                      Visibility="{Binding OpensReportForm,
+                                                   Converter={StaticResource VisInv}}"
                                       Stroke="{StaticResource B.TextMuted}">
                                     <Path.RenderTransform>
                                         <TranslateTransform x:Name="ArrowShift" X="0"/>

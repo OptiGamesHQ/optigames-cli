@@ -134,13 +134,48 @@ public sealed class BugReportViewModel : ObservableObject
         }
     }
 
+    /// <summary>The shortest report worth sending. Below this it is "it broke" with no bug in it.</summary>
+    private const int MinMessageLength = 10;
+
     public bool CanSubmit =>
-        !IsSending && !IsSent && EmailLooksValid && Message.Trim().Length >= 10;
+        !IsSending && !IsSent && EmailLooksValid && Message.Trim().Length >= MinMessageLength;
+
+    /// <summary>
+    /// Why Send is greyed out, in the words of whatever is actually missing.
+    ///
+    /// A disabled button with no explanation is indistinguishable from a broken one — which is
+    /// exactly how this form was read: it opens with both fields empty, so Send starts dead, and
+    /// nothing on screen connected that to the box the user had not typed in yet. Empty once the
+    /// form is valid, and empty before they have touched anything, because scolding someone for
+    /// not having filled in a form they just opened is its own kind of wrong.
+    /// </summary>
+    public string SubmitHint
+    {
+        get
+        {
+            if (IsSending || IsSent || CanSubmit) return "";
+
+            bool hasEmail = Email.Trim().Length > 0;
+            bool hasMessage = Message.Trim().Length > 0;
+            if (!hasEmail && !hasMessage) return "";
+
+            if (!EmailLooksValid)
+                return hasEmail
+                    ? "That email does not look right — check it before sending."
+                    : "Add the email you want the reply sent to.";
+
+            return $"Describe what happened in a bit more detail ({Message.Trim().Length} of {MinMessageLength} characters).";
+        }
+    }
+
+    public bool HasSubmitHint => SubmitHint.Length > 0;
 
     private void RaiseValidity()
     {
         Raise(nameof(EmailLooksValid));
         Raise(nameof(CanSubmit));
+        Raise(nameof(SubmitHint));
+        Raise(nameof(HasSubmitHint));
         RelayCommand.RaiseCanExecuteChanged();
     }
 

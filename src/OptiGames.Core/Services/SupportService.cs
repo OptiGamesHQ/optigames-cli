@@ -118,6 +118,14 @@ public sealed class SupportService
                 email,
                 message,
                 attachmentIds = attachmentIds.ToArray(),
+                // Marks the thread as coming from the tool rather than the site's chat panel.
+                // This is what makes the conversation happen by email: the app posts a report and
+                // then forgets it — there is no thread view in here to read a reply in — so the
+                // server sends the reporter a receipt they can reply to, and staff answers are
+                // mailed instead of being left in an inbox the reporter cannot see. Without it the
+                // report lands as a "widget" thread and every reply is written into a panel that
+                // does not exist, which is exactly what used to happen.
+                source = "app",
                 // The honeypot field, deliberately empty. The server treats anything in it as a
                 // bot and silently discards the report, so it must be sent blank rather than
                 // omitted-and-guessed-at later.
